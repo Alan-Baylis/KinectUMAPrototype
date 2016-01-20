@@ -8,6 +8,7 @@ public class UMAMaker : MonoBehaviour
     public SlotLibrary slotLibrary;
     public OverlayLibrary overlayLibrary;
     public RaceLibrary raceLibrary;
+    public RuntimeAnimatorController animController;
 
     private UMADynamicAvatar avatar;
     private UMAData umaData;
@@ -38,9 +39,14 @@ public class UMAMaker : MonoBehaviour
 
         CreateMale();
 
+        avatar.animationController = animController;
+
         avatar.UpdateNewRace();
 
-
+        myUMA.transform.parent = this.gameObject.transform;
+        myUMA.transform.localPosition = Vector3.zero;
+        myUMA.transform.localRotation = Quaternion.identity;
+        //avatar.
     }
 
     void CreateMale()
@@ -61,20 +67,46 @@ public class UMAMaker : MonoBehaviour
         umaData.umaRecipe.slotDataList[3].AddOverlay(overlayLibrary.InstantiateOverlay("MaleBody02"));
 
         umaData.umaRecipe.slotDataList[4] = slotLibrary.InstantiateSlot("MaleHands");
-        umaData.umaRecipe.slotDataList[4].AddOverlay(overlayLibrary.InstantiateOverlay("MaleBody02"));
+        umaData.umaRecipe.slotDataList[4].SetOverlayList(umaRecipe.slotDataList[3].GetOverlayList());
 
         umaData.umaRecipe.slotDataList[5] = slotLibrary.InstantiateSlot("MaleLegs");
-        umaData.umaRecipe.slotDataList[5].AddOverlay(overlayLibrary.InstantiateOverlay("MaleBody02"));
+        umaData.umaRecipe.slotDataList[5].SetOverlayList(umaRecipe.slotDataList[3].GetOverlayList());
 
         umaData.umaRecipe.slotDataList[6] = slotLibrary.InstantiateSlot("MaleFeet");
-        umaData.umaRecipe.slotDataList[6].AddOverlay(overlayLibrary.InstantiateOverlay("MaleBody02"));
+        umaData.umaRecipe.slotDataList[6].SetOverlayList(umaRecipe.slotDataList[3].GetOverlayList());
 
         umaData.umaRecipe.slotDataList[3].AddOverlay(overlayLibrary.InstantiateOverlay("MaleUnderwear01"));
         umaData.umaRecipe.slotDataList[5].AddOverlay(overlayLibrary.InstantiateOverlay("MaleUnderwear01"));
+
+        umaData.umaRecipe.slotDataList[0].AddOverlay(overlayLibrary.InstantiateOverlay("MaleEyebrow01", Color.black));
+
+        // umaDna.headSize = 1f;
     }
 
     void Start()
     {
         GenerateUMA();
+    }
+
+    void Update()
+    {
+        var enumerable =  umaData.skeleton.BoneHashes.GetEnumerator();
+        enumerable.MoveNext();
+        int firstCode = enumerable.Current;
+        
+        // var pos = umaData.skeleton.GetPosition(firstCode);
+        // var rot = umaData.skeleton.GetRotation(firstCode);
+        // var go = umaData.skeleton.GetBoneGameObject(firstCode);
+        //Debug.Log(firstCode + ": " + pos + ", " + rot);
+        //Debug.Log(go.name);
+
+        foreach (int code in umaData.skeleton.BoneHashes) {
+            var go = umaData.skeleton.GetBoneGameObject(code);
+            var name = go.name;
+            if (name == "RightForeArm") {
+                go.transform.Rotate(0.0f, 40.0f * Time.deltaTime, 0.0f);
+            }
+            //Debug.Log(name);
+        }
     }
 }

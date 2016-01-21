@@ -1,6 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UMA;
+using Kinect = Windows.Kinect;
+using System.Collections.Generic;
+using UnityEngine.UI;
 
 public class UMAMaker : MonoBehaviour
 {
@@ -9,11 +12,14 @@ public class UMAMaker : MonoBehaviour
     public OverlayLibrary overlayLibrary;
     public RaceLibrary raceLibrary;
     public RuntimeAnimatorController animController;
+    public KinectUMAController kinectController;
+    public BodySourceManager bodyManager;
 
     private UMADynamicAvatar avatar;
     private UMAData umaData;
     private UMADnaHumanoid umaDna;
     private UMADnaTutorial umaTutorialDna;
+    public Text output;
 
     private const int NUM_SLOTS = 20;
 
@@ -46,7 +52,6 @@ public class UMAMaker : MonoBehaviour
         myUMA.transform.parent = this.gameObject.transform;
         myUMA.transform.localPosition = Vector3.zero;
         myUMA.transform.localRotation = Quaternion.identity;
-        //avatar.
     }
 
     void CreateMale()
@@ -86,19 +91,16 @@ public class UMAMaker : MonoBehaviour
     void Start()
     {
         GenerateUMA();
+        kinectController = new KinectUMAController(avatar.umaData, bodyManager);
+        
     }
 
     void Update()
     {
-        var enumerable =  umaData.skeleton.BoneHashes.GetEnumerator();
+       /* var enumerable =  umaData.skeleton.BoneHashes.GetEnumerator();
         enumerable.MoveNext();
         int firstCode = enumerable.Current;
         
-        // var pos = umaData.skeleton.GetPosition(firstCode);
-        // var rot = umaData.skeleton.GetRotation(firstCode);
-        // var go = umaData.skeleton.GetBoneGameObject(firstCode);
-        //Debug.Log(firstCode + ": " + pos + ", " + rot);
-        //Debug.Log(go.name);
 
         foreach (int code in umaData.skeleton.BoneHashes) {
             var go = umaData.skeleton.GetBoneGameObject(code);
@@ -106,7 +108,14 @@ public class UMAMaker : MonoBehaviour
             if (name == "RightForeArm") {
                 go.transform.Rotate(0.0f, 40.0f * Time.deltaTime, 0.0f);
             }
-            //Debug.Log(name);
+        }*/
+
+        kinectController.Update();
+        Debug.Log(kinectController.angles);
+        if (kinectController.angles != null)
+        {
+            output.text = kinectController.angles.ToString();
         }
+        
     }
 }
